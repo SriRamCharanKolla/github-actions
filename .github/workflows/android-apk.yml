@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: android-apk-${{ github.workflow }}-${{ github.ref }}
@@ -45,7 +45,7 @@ jobs:
       - name: Install Android build tools
         run: |
           yes | sdkmanager --licenses
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install JavaScript dependencies
         run: npm ci
@@ -73,8 +73,24 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Publish GitHub Release with Direct APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "DevOps Mobile Build #${{ github.run_number }} (${{ github.ref_name }})"
+          body: |
+            ### 📱 Android Debug APK Release
+            - **Branch**: `${{ github.ref_name }}`
+            - **Commit**: `${{ github.sha }}`
+            - **Triggered By**: @${{ github.actor }}
+            
+            📲 Direct APK Download: [app-debug.apk](https://github.com/${{ github.repository }}/releases/download/v${{ github.run_number }}/app-debug.apk)
+          files: ionic-capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Send APK Build to Email Recipients
-        if: success() # Only send if all previous build steps succeeded
+        if: success()
         uses: dawidd6/action-send-mail@v4
         with:
           server_address: smtp.gmail.com
@@ -82,43 +98,48 @@ jobs:
           secure: true
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "🚀 Android APK Build Ready [Branch: ${{ github.ref_name }}]"
+          subject: "📲 Install New Android APK [Build #${{ github.run_number }} - ${{ github.ref_name }}]"
           to: ramcharankola@gmail.com,ramcharankola2@gmail.com
           from: "GitHub Actions CI <${{ secrets.MAIL_USERNAME }}>"
           html_body: |
             <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e1e4e8; border-radius: 8px; padding: 20px;">
-              <h2 style="color: #2da44e; margin-top: 0;">🚀 Android Debug APK Build Successful</h2>
+              <h2 style="color: #2da44e; margin-top: 0;">📱 Android App Ready for Installation</h2>
               <p>Hi Team,</p>
-              <p>The Android APK build has completed successfully on GitHub Actions CI!</p>
+              <p>A new Android APK has been built and is ready to install directly on your phone!</p>
               
               <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
                 <tr style="background-color: #f6f8fa;">
+                  <td style="padding: 8px; border: 1px solid #d0d7de;"><strong>Build</strong></td>
+                  <td style="padding: 8px; border: 1px solid #d0d7de;"><code>#${{ github.run_number }}</code></td>
+                </tr>
+                <tr>
                   <td style="padding: 8px; border: 1px solid #d0d7de;"><strong>Branch</strong></td>
                   <td style="padding: 8px; border: 1px solid #d0d7de;"><code>${{ github.ref_name }}</code></td>
                 </tr>
-                <tr>
+                <tr style="background-color: #f6f8fa;">
                   <td style="padding: 8px; border: 1px solid #d0d7de;"><strong>Commit</strong></td>
                   <td style="padding: 8px; border: 1px solid #d0d7de;"><code>${{ github.sha }}</code></td>
                 </tr>
-                <tr style="background-color: #f6f8fa;">
-                  <td style="padding: 8px; border: 1px solid #d0d7de;"><strong>Triggered By</strong></td>
-                  <td style="padding: 8px; border: 1px solid #d0d7de;">${{ github.actor }}</td>
-                </tr>
                 <tr>
-                  <td style="padding: 8px; border: 1px solid #d0d7de;"><strong>Repository</strong></td>
-                  <td style="padding: 8px; border: 1px solid #d0d7de;">${{ github.repository }}</td>
+                  <td style="padding: 8px; border: 1px solid #d0d7de;"><strong>Developer</strong></td>
+                  <td style="padding: 8px; border: 1px solid #d0d7de;">${{ github.actor }}</td>
                 </tr>
               </table>
 
               <div style="text-align: center; margin: 25px 0;">
-                <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" 
-                   style="background-color: #2da44e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-                  📥 Download APK from Workflow Artifacts
+                <a href="https://github.com/${{ github.repository }}/releases/download/v${{ github.run_number }}/app-debug.apk" 
+                   style="background-color: #2da44e; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+                  📲 Tap Here to Download & Install APK (.apk)
                 </a>
               </div>
 
-              <p style="font-size: 12px; color: #6e7781; border-top: 1px solid #e1e4e8; padding-top: 12px;">
-                💡 <em>Note: Direct .apk file attachments are blocked by Google's email security policy (Error 552). The link above allows you to download the packaged APK directly from GitHub.</em>
-              </p>
+              <div style="background-color: #fff8c5; border: 1px solid #d4a72c; border-radius: 6px; padding: 12px; margin-top: 15px; font-size: 13px;">
+                <strong>⚠️ Mobile Installation Tips:</strong>
+                <ul style="margin: 5px 0 0 0; padding-left: 20px;">
+                  <li>If you had an older test version installed, <strong>uninstall it first</strong>.</li>
+                  <li>When prompted, allow <em>"Install unknown apps"</em> for your browser.</li>
+                  <li>This link downloads the raw <code>app-debug.apk</code> directly (no zip extraction needed).</li>
+                </ul>
+              </div>
             </div>
 
