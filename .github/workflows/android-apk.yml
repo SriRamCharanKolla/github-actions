@@ -2,6 +2,8 @@ name: Build Android APK
 
 on:
   push:
+    branches:
+      - '**' # Triggers automatically on pushes to ANY branch
   workflow_dispatch:
 
 permissions:
@@ -70,3 +72,34 @@ jobs:
           path: ionic-capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Send APK Build to Email Recipients
+        if: success() # Only send if all previous build steps succeeded
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "🚀 Android APK Build Successful [Branch: ${{ github.ref_name }}]"
+          to: ramcharankola@gmail.com,ramcharankola2@gmail.com
+          from: "GitHub Actions CI <${{ secrets.MAIL_USERNAME }}>"
+          body: |
+            Hi Team,
+
+            The Android APK build has completed successfully!
+
+            📌 Build Summary:
+            - Branch: ${{ github.ref_name }}
+            - Commit: ${{ github.sha }}
+            - Author: ${{ github.actor }}
+            - Repository: ${{ github.repository }}
+            - Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            The generated debug APK file is attached to this email.
+
+            Best regards,
+            DevOps CI/CD Automation
+          attachments: ionic-capacitor-app/android/app/build/outputs/apk/debug/app-debug.apk
+
