@@ -3,7 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  sync: {
+    // Set this to the HTTPS API origin for the construction backend. The app
+    // remains fully usable offline when it is empty or unreachable.
+    apiBaseUrl: 'http://localhost:3000',
+    requestTimeoutMs: 15_000,
+  },
 };
 
 /*

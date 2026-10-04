@@ -1,20 +1,90 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      FieldSync
     </ion-title>
+    <ion-badge slot="end" [color]="connection.connected ? 'success' : 'medium'" class="connection-badge">
+      {{ connection.connected ? 'Online' : 'Offline' }}
+    </ion-badge>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">FieldSync</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Site activity</ion-card-title>
+        <ion-card-subtitle>Saved to SQLite before any network request</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-input
+            label="Site name"
+            labelPlacement="stacked"
+            placeholder="e.g. Tower A"
+            [(ngModel)]="siteName"
+            [disabled]="isSaving">
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-textarea
+            label="Activity notes"
+            labelPlacement="stacked"
+            placeholder="Concrete pour completed, safety observation, materials received..."
+            [autoGrow]="true"
+            [(ngModel)]="notes"
+            [disabled]="isSaving">
+          </ion-textarea>
+        </ion-item>
+        <ion-button expand="block" (click)="saveActivity()" [disabled]="isSaving || !siteName.trim()">
+          {{ isSaving ? 'Saving locally…' : 'Save activity' }}
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="sync-card">
+      <ion-card-content>
+        <div class="sync-status">
+          <ion-icon [name]="connection.connected ? 'cloud-done-outline' : 'cloud-offline-outline'" aria-hidden="true"></ion-icon>
+          <span>{{ message }}</span>
+        </div>
+        <div class="sync-actions">
+          <ion-button fill="outline" size="small" (click)="syncNow()" [disabled]="isSyncing || !connection.connected">
+            {{ isSyncing ? 'Syncing…' : 'Sync now' }}
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="retryAttentionItems()" [disabled]="isSyncing">
+            Retry failed
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list inset="true">
+      <ion-list-header>
+        <ion-label>Saved activities</ion-label>
+      </ion-list-header>
+      <ion-item *ngFor="let activity of activities; trackBy: trackByActivity">
+        <ion-label>
+          <h2>{{ activity.siteName }}</h2>
+          <p>{{ activity.notes || 'No notes entered' }}</p>
+          <p>{{ activity.createdAt | date:'medium' }}</p>
+          <p *ngIf="activity.lastError" class="error-text">{{ activity.lastError }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="statusColor(activity.status)">{{ activity.status }}</ion-badge>
+      </ion-item>
+      <ion-item *ngIf="activities.length === 0" lines="none">
+        <ion-label color="medium">No site activities saved on this device yet.</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <p class="offline-note">
+      A network drop never discards an activity. Each server step is queued with an idempotency key and resumes from the first unfinished API call.
+    </p>
   </div>
 </ion-content>
