@@ -3,7 +3,7 @@ name: Trigger
 on: 
   push:
     branches: 
-        - 'feature*' # trigger on all feature branches. any branch starting with feature
+        - 'main' # trigger on all feature branches. any branch starting with feature
 
 jobs:
   trigger:
@@ -12,4 +12,4 @@ jobs:
         # - name: Manual dispatch
         #   run: echo "manually dispatched"
         - name: feature branch push
-          run: echo "feature branch push"
+          run: echo "main branch push"
