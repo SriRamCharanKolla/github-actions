@@ -6,10 +6,10 @@ on:
         - 'feature*' # trigger on all feature branches. any branch starting with feature
 
 jobs:
-    trigger:
-        runs-on: ubuntu-latest
-        steps:
-            # - name: Manual dispatch
-            #   run: echo "manually dispatched"
-            - name: feature branch push
-              run: echo "feature branch push"
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+        # - name: Manual dispatch
+        #   run: echo "manually dispatched"
+        - name: feature branch push
+          run: echo "feature branch push"
