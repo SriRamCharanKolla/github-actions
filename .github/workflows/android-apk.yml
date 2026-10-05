@@ -1,9 +1,9 @@
 name: Build Android APK
 
 on:
-  push:
-    branches:
-      - '**' # Triggers automatically on pushes to ANY branch
+  # push:
+  #   branches:
+  #     - '**' # Triggers automatically on pushes to ANY branch
   workflow_dispatch:
 
 permissions:
