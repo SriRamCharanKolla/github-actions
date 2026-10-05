@@ -1,9 +1,13 @@
 name: Trigger
 # on: workflow_dispatch # workflow manual dispatch
 on: 
-  push:
-    branches: 
-        - 'main' # trigger on all feature branches. any branch starting with feature
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - 'releases/**'
+  # push:
+  #   branches: 
+  #       - 'main' # trigger on all feature branches. any branch starting with feature
 
 jobs:
   trigger:
@@ -11,5 +15,7 @@ jobs:
     steps:
         # - name: Manual dispatch
         #   run: echo "manually dispatched"
-        - name: main branch push
-          run: echo "main branch push"
+        # - name: main branch push
+        #   run: echo "main branch push"
+        - name: PR opened or reopened
+          run: echo "Pull request opened or reopened"
