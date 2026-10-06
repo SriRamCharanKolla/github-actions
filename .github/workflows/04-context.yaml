@@ -1,6 +1,10 @@
 name: Contexts demo
 on: [push]
 
+env:
+  project: "roboshop"
+  component: "catalogue"
+  environment: "dev"
 jobs:
   github-context:
     runs-on: ubuntu-latest
@@ -9,4 +13,8 @@ jobs:
         run: |
           echo "${{ toJson(github) }}"
           echo "branch name: ${{ github.ref_name }}"
-      
+      - name: print environment variables
+        run: |
+          echo "project name: $project"
+          echo "component name: $component"
+          echo "environment name: $environment"
