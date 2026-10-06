@@ -13,8 +13,14 @@ jobs:
         run: |
           echo "${{ toJson(github) }}"
           echo "branch name: ${{ github.ref_name }}"
+
       - name: print environment variables
         run: |
           echo "project name: $project"
           echo "component name: $component"
           echo "environment name: $environment"
+          
+      - name: print secrets
+        run: |
+          echo "DB user name: ${{ secrets.DB_USER }}"
+          echo "DB password: ${{ secrets.DB_PASSWORD }}"
