@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   github-context:
-    runs-on: ubutu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: print github info
         run: echo "${{ toJson(github) }}"
