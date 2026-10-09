@@ -8,6 +8,9 @@ env:
 jobs:
   github-context:
     runs-on: ubuntu-latest
+    outputs:
+      image-name: ${{ steps.tag.outputs.image-name }}
+      image-version: ${{ steps.tag.outputs.version }}
     steps:
       - name: print github info
         run: |
@@ -53,9 +56,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    # needs: github-context # means depends on above job
+    needs: github-context # means depends on github-context job
     steps:
       - name: print github env in other job
+        # run: |
+        #   echo "Course name: $Course"
+        #   echo "Course duration: $Duration"
         run: |
-          echo "Course name: $Course"
-          echo "Course duration: $Duration"
+          echo "Image name: ${{ needs.github-context.outputs.image-name }}"
+          echo "Image version: ${{ needs.github-context.outputs.image-version}}"
