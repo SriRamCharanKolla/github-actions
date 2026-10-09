@@ -40,6 +40,7 @@ jobs:
           echo "Image name: ${{ steps.tag.outputs.image-name }}"
           echo "Version: ${{ steps.tag.outputs.version }}"
 
+      # useful with in the job
       - name: github env
         run: |
           echo "Course=github actions" >> $GITHUB_ENV
@@ -52,7 +53,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: github-context
+    # needs: github-context # means depends on above job
     steps:
       - name: print github env in other job
         run: |
