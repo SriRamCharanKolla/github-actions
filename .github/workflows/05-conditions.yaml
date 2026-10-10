@@ -1,4 +1,4 @@
-name: CONDITIONS DEMO
+name: conditions demo
 on: [push]
 
 jobs:
@@ -6,9 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: main branch
-        if: github.ref_name == "main"
-        run: echo "This block executes if push action is happend and branch name is main"
+        if: github.ref_name == 'main'
+        run: echo "This block executes if push action is happend and branch name is matched with main"
 
       - name: feature branch
-        if: github.ref_name == "feature-*"
-        run: echo "This block executes if push action is happend and branch name is feature"
+        if: github.ref_name == 'feature-*'
+        run: echo "This block executes if push action is happend and branch name is matched with feature"
