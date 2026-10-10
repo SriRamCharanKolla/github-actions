@@ -1,0 +1,12 @@
+name: main-workflow
+on: [push]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }} # main-workflow-main
+  cancel-in-progress: true # if "cancel-in-progress" value is true then present execution will be cancelled, new trigger will happen
+
+jobs:
+  say-hello:
+    runs-on: unbuntu-latest
+    steps:
+      - name: greet world
+        run: sleep 30
