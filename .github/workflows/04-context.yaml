@@ -65,3 +65,9 @@ jobs:
         run: |
           echo "Image name: ${{ needs.github-context.outputs.image-name }}"
           echo "Image version: ${{ needs.github-context.outputs.image-version}}"
+
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: run sonar scan
+        run: echo "Sonar Scan"
